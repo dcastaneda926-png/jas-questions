@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>a few questions for jas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,400..700,0..100,0..1;1,9..144,400..700,0..100,0..1&family=Nunito:wght@400;600;700;800&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#FFF3F6; --surface:#FFFFFF; --field:#FFEEF3; --track:#F6D5DF;
+  --ink:#3D1A2B; --muted:#8A6475; --petal:#F9CDDA; --rose:#C8336A; --rose-ink:#FFFFFF;
+  --leaf:#5E8C5A; --line:#F2D6DF; --soil:#EBC3D0; --glow:rgba(246,193,208,.6);
+  --shadow:0 24px 50px -28px rgba(200,51,106,.45);
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#22111A; --surface:#2F1923; --field:#3A2030; --track:#4A2A3A;
+    --ink:#FBE6EE; --muted:#C9A1B2; --petal:#6E3150; --rose:#F07CA3; --rose-ink:#2A0F1B;
+    --leaf:#7FB27A; --line:#4A2A3A; --soil:#5A3446; --glow:rgba(240,124,163,.14);
+    --shadow:0 24px 50px -28px rgba(0,0,0,.7);
+    color-scheme:dark;
+  }
+}
+*{box-sizing:border-box;margin:0}
+html{-webkit-text-size-adjust:100%}
+body{
+  font-family:'Nunito',system-ui,sans-serif; background:var(--bg); color:var(--ink);
+  min-height:100dvh; display:flex; flex-direction:column; line-height:1.5;
+  -webkit-tap-highlight-color:transparent;
+}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:-1;
+  background:radial-gradient(70% 45% at 50% 0%, var(--glow), transparent 70%)}
+:focus-visible{outline:3px solid var(--rose);outline-offset:3px}
+
+/* top bar */
+.top{display:flex;justify-content:space-between;align-items:baseline;gap:12px;
+  padding:18px 22px 6px;max-width:580px;width:100%;margin:0 auto}
+.from{font-family:'Fraunces',Georgia,serif;font-style:italic;font-variation-settings:'SOFT' 100,'WONK' 1;color:var(--muted);font-size:1rem}
+.progress{font-weight:800;color:var(--muted);font-size:.9rem;font-variant-numeric:tabular-nums}
+
+/* card */
+main{flex:1;display:flex;justify-content:center;align-items:flex-start;padding:10px 16px 18px}
+#stage{width:min(540px,100%);background:var(--surface);border:1px solid var(--line);border-radius:30px;
+  box-shadow:var(--shadow);padding:30px 22px 22px;overflow:hidden}
+@media (min-width:600px){ main{align-items:center} #stage{padding:40px 38px 30px} }
+
+h1{font-family:'Fraunces',Georgia,serif;font-variation-settings:'SOFT' 100,'WONK' 1;font-weight:600;
+  font-size:clamp(1.65rem,6.2vw,2.15rem);line-height:1.15;letter-spacing:-.015em;outline:none;text-wrap:balance}
+.hint{color:var(--muted);margin-top:8px;font-size:1rem}
+.answer{margin:26px 0 30px}
+
+/* buttons */
+.btn{font:inherit;font-weight:800;font-size:1rem;border:0;cursor:pointer;border-radius:999px;padding:14px 28px;
+  transition:transform .15s ease, background-color .25s, color .25s, box-shadow .25s}
+.btn:active{transform:scale(.96)}
+.btn-primary{background:var(--rose);color:var(--rose-ink);box-shadow:0 12px 24px -14px var(--rose)}
+.btn-primary.is-skip{background:transparent;color:var(--rose);box-shadow:inset 0 0 0 2px var(--line)}
+.btn-ghost{background:transparent;color:var(--muted);padding:14px 8px}
+.btn-soft{background:var(--field);color:var(--ink)}
+.btn:disabled{opacity:.4;cursor:default;transform:none}
+.nav{display:flex;justify-content:space-between;align-items:center;gap:12px}
+
+/* text inputs */
+input[type=text],textarea{width:100%;font:inherit;font-size:1.05rem;color:var(--ink);background:var(--field);
+  border:2px solid transparent;border-radius:16px;padding:14px 16px;transition:border-color .2s, background-color .2s}
+input[type=text]:focus,textarea:focus{outline:none;border-color:var(--rose);background:var(--surface)}
+input::placeholder,textarea::placeholder{color:var(--muted);opacity:.8}
+input:disabled{opacity:.6}
+textarea{resize:none;min-height:140px;line-height:1.55}
+.fields{display:grid;gap:16px}
+.field .lbl{display:block;font-weight:800;font-size:.92rem;margin:0 0 6px 4px}
+
+/* color swatches */
+.swatches{display:grid;grid-template-columns:repeat(auto-fill,minmax(86px,1fr));gap:8px}
+.swatch{position:relative;display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 4px;
+  border-radius:18px;border:2px solid transparent;background:transparent;font:inherit;color:var(--ink);cursor:pointer;
+  transition:background-color .2s, border-color .2s}
+.swatch .dot{width:44px;height:44px;border-radius:50%;background:var(--sw);box-shadow:inset 0 0 0 1px rgba(0,0,0,.1);
+  transition:transform .35s cubic-bezier(.3,1.6,.5,1)}
+.swatch .nm{font-size:.85rem;font-weight:700}
+.swatch.on{border-color:var(--rose);background:var(--field)}
+.swatch.on .dot{transform:scale(1.18)}
+.swatch .rainbow{background:conic-gradient(#F49AB8,#F6A04D,#F5D76E,#7FC59A,#7DB7E8,#A98BE0,#F49AB8)}
+.swatch.custom input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;border:0;padding:0}
+.swatch.custom:focus-within{outline:3px solid var(--rose);outline-offset:2px}
+
+/* lists */
+.adder{display:flex;gap:8px}
+.btn-add{padding:0 22px;background:var(--rose);color:var(--rose-ink)}
+.chips{list-style:none;padding:0;display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.chip{display:inline-flex;align-items:center;gap:6px;background:var(--petal);padding:7px 6px 7px 14px;border-radius:999px;font-weight:700}
+.chip .x{border:0;background:transparent;color:inherit;font-size:1.25rem;line-height:1;width:30px;height:30px;border-radius:50%;cursor:pointer}
+.chip .x:hover{background:rgba(0,0,0,.08)}
+.count{margin-top:12px;color:var(--muted);font-size:.85rem;font-weight:700}
+.pop{animation:pop .45s cubic-bezier(.3,1.6,.5,1)}
+@keyframes pop{from{transform:scale(.4);opacity:0}to{transform:scale(1);opacity:1}}
+
+/* ranked */
+.ranked{list-style:none;padding:0;display:grid;gap:12px}
+.ranked li{display:flex;align-items:center;gap:12px}
+.num{flex:none;width:38px;height:38px;border-radius:50%;background:var(--petal);display:grid;place-items:center;
+  font-family:'Fraunces',serif;font-weight:700;font-size:1.15rem}
+
+/* choice cards */
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.opt{display:flex;align-items:center;gap:10px;text-align:left;padding:14px 12px;border-radius:18px;background:var(--field);
+  border:2px solid transparent;font:inherit;font-weight:700;color:var(--ink);cursor:pointer;line-height:1.25;
+  transition:background-color .2s, border-color .2s}
+.opt .emo{font-size:1.5rem;flex:none}
+.opt.on{background:var(--petal);border-color:var(--rose)}
+.opt.wiggle .emo{animation:wiggle .55s ease}
+@keyframes wiggle{0%,100%{transform:rotate(0) scale(1)}25%{transform:rotate(-14deg) scale(1.25)}60%{transform:rotate(10deg) scale(1.15)}}
+.other{margin-top:12px}
+
+/* slider */
+.ends{display:flex;justify-content:space-between;align-items:center;font-weight:700;color:var(--muted);margin-bottom:16px;font-size:.95rem}
+.ends b{font-size:1.7rem;margin:0 6px;vertical-align:middle}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:12px;border-radius:99px;outline:none;cursor:pointer;
+  background:linear-gradient(to right,var(--rose) 0 var(--v,50%),var(--track) var(--v,50%) 100%)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:34px;height:34px;border-radius:50%;background:var(--surface);
+  border:4px solid var(--rose);box-shadow:0 8px 16px -8px var(--rose);transition:transform .2s}
+input[type=range]:active::-webkit-slider-thumb{transform:scale(1.15)}
+input[type=range]::-moz-range-thumb{width:26px;height:26px;border-radius:50%;background:var(--surface);border:4px solid var(--rose)}
+input[type=range]:focus-visible{outline:3px solid var(--rose);outline-offset:10px}
+.slider-out{text-align:center;margin-top:20px;font-family:'Fraunces',serif;font-style:italic;font-variation-settings:'SOFT' 100,'WONK' 1;
+  font-size:1.55rem;color:var(--rose);min-height:2.3rem}
+.slider-out.muted{color:var(--muted);font-size:1.05rem;font-style:normal;font-family:'Nunito',sans-serif;font-weight:700}
+
+/* this or that */
+.tot{display:grid;gap:10px}
+.tot-row{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px}
+.tot-btn{padding:14px 8px;border-radius:16px;border:0;background:var(--field);font:inherit;font-weight:700;color:var(--ink);cursor:pointer;
+  transition:background-color .25s, color .25s, opacity .25s, transform .3s cubic-bezier(.3,1.6,.5,1)}
+.tot-btn.on{background:var(--rose);color:var(--rose-ink);transform:scale(1.04)}
+.decided .tot-btn:not(.on){opacity:.45}
+.or{font-family:'Fraunces',serif;font-style:italic;color:var(--muted)}
+
+/* intro */
+.intro{text-align:center}
+.intro h1{font-size:clamp(2.7rem,13vw,3.7rem);margin-top:6px}
+.intro h1 .name{font-family:'Dancing Script',cursive;font-weight:700;font-size:1.3em;color:var(--rose);
+  display:inline-block;transform:rotate(-4deg);margin-left:.08em;line-height:1}
+.lede{font-size:1.1rem;margin:14px auto 0;max-width:34ch}
+.small{color:var(--muted);margin-top:12px;font-size:.95rem}
+.intro-actions{display:grid;gap:6px;justify-items:center;margin-top:28px}
+.big-btn{padding:16px 42px;font-size:1.1rem}
+.hero{display:flex;justify-content:center}
+.ht .stem{fill:none;stroke:var(--leaf);stroke-width:2.2;stroke-linecap:round;transform-box:fill-box;transform-origin:50% 100%;
+  animation:grow .9s cubic-bezier(.3,1.3,.5,1) both;animation-delay:var(--d)}
+.ht .leaf{fill:var(--leaf);transform-box:fill-box;transform-origin:100% 100%;animation:popIn .5s cubic-bezier(.3,1.6,.5,1) both;animation-delay:calc(var(--d) + .35s)}
+.ht .leaf.r{transform-origin:0% 100%}
+.ht .bloom{fill:var(--c);transform-box:fill-box;transform-origin:50% 100%;animation:popIn .6s cubic-bezier(.3,1.7,.5,1) both;animation-delay:calc(var(--d) + .6s)}
+@keyframes grow{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+@keyframes popIn{from{transform:scale(0)}to{transform:scale(1)}}
+
+/* end + summary */
+.end{text-align:center}
+.end .lede{margin-bottom:6px}
+.summary{text-align:left;margin:24px 0 26px}
+.summary .row{padding:14px 2px;border-top:1px dashed var(--line)}
+.summary dt{font-size:.88rem;font-weight:800;color:var(--muted)}
+.summary dd{font-family:'Fraunces',serif;font-variation-settings:'SOFT' 100;font-size:1.15rem;margin-top:2px;line-height:1.4;overflow-wrap:anywhere}
+.summary dd ul{list-style:none;padding:0;display:grid;gap:2px}
+.mini-dot{display:inline-block;width:16px;height:16px;border-radius:50%;background:var(--sw);vertical-align:-2px;margin-right:8px;box-shadow:inset 0 0 0 1px rgba(0,0,0,.15)}
+.end-actions{display:grid;gap:10px}
+.end-actions .btn{width:100%}
+.tiny{display:flex;justify-content:center;flex-wrap:wrap;gap:16px;margin-top:14px}
+.linkish{background:none;border:0;font:inherit;font-weight:700;color:var(--muted);text-decoration:underline;text-underline-offset:3px;cursor:pointer;padding:6px}
+
+/* screen transitions */
+.q-wrap.in-right{animation:inR .4s cubic-bezier(.2,.8,.2,1)}
+.q-wrap.in-left{animation:inL .4s cubic-bezier(.2,.8,.2,1)}
+.q-wrap.out-left{animation:outL .2s ease forwards}
+.q-wrap.out-right{animation:outR .2s ease forwards}
+@keyframes inR{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:none}}
+@keyframes inL{from{opacity:0;transform:translateX(-30px)}to{opacity:1;transform:none}}
+@keyframes outL{to{opacity:0;transform:translateX(-30px)}}
+@keyframes outR{to{opacity:0;transform:translateX(30px)}}
+
+/* tulip garden progress */
+.garden-wrap{position:sticky;bottom:0;padding:16px 16px calc(12px + env(safe-area-inset-bottom));
+  background:linear-gradient(to top,var(--bg) 70%,transparent);pointer-events:none}
+.garden{max-width:540px;margin:0 auto;display:flex;justify-content:center;align-items:flex-end;gap:2px;
+  border-bottom:3px solid var(--soil);border-radius:2px;padding:0 6px}
+.tulip{flex:1;max-width:28px;height:54px;overflow:visible;transform:rotate(var(--tilt));transform-origin:50% 100%}
+.tulip .stem{fill:none;stroke:var(--leaf);stroke-width:2.2;stroke-linecap:round;transform-box:fill-box;transform-origin:50% 100%;
+  transform:scaleY(.2);transition:transform .7s cubic-bezier(.3,1.3,.5,1)}
+.tulip .leaf{fill:var(--leaf);transform-box:fill-box;transform-origin:100% 100%;transform:scale(0);transition:transform .5s cubic-bezier(.3,1.6,.5,1) .15s}
+.tulip .leaf.r{transform-origin:0% 100%}
+.tulip .bloom{fill:var(--c);transform-box:fill-box;transform-origin:50% 100%;transform:scale(0);transition:transform .55s cubic-bezier(.3,1.7,.5,1) .4s}
+.tulip.current:not(.bloomed) .stem{transform:scaleY(.42)}
+.tulip.current:not(.bloomed) .leaf{transform:scale(.55)}
+.tulip.bloomed .stem{transform:scaleY(1)}
+.tulip.bloomed .leaf,.tulip.bloomed .bloom{transform:scale(1)}
+body[data-screen=end] .tulip.bloomed{animation:sway 2.8s ease-in-out infinite alternate}
+@keyframes sway{from{transform:rotate(calc(var(--tilt) - 4deg))}to{transform:rotate(calc(var(--tilt) + 4deg))}}
+
+/* falling petals + toast */
+.petals{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:50}
+.petals span{position:absolute;top:-30px;border-radius:80% 0 80% 0;opacity:.9;animation:fall ease-in forwards}
+@keyframes fall{to{transform:translate(var(--drift),110vh) rotate(var(--spin))}}
+.toast{position:fixed;left:50%;bottom:100px;transform:translate(-50%,16px);background:var(--ink);color:var(--bg);
+  padding:10px 20px;border-radius:999px;font-weight:800;opacity:0;transition:opacity .3s, transform .3s;z-index:60;pointer-events:none}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+}
+</style>
+</head>
+<body data-screen="intro">
+  <header class="top">
+    <span class="from" id="from"></span>
+    <span class="progress" id="progress" aria-live="polite"></span>
+  </header>
+  <main><div id="stage"></div></main>
+  <footer class="garden-wrap" aria-hidden="true"><div class="garden" id="garden"></div></footer>
+  <div class="toast" id="toast" role="status"></div>
+
+<script>
+/* ===== edit these to personalize ===== */
+const HER = "Jas";
+const ME = "David";
+
+const QUESTIONS = [
+  { id:"intro", type:"intro" },
+  { id:"color", type:"color", label:"favorite color", q:"what's your favorite color?", hint:"tap one, or pick your exact shade" },
+  { id:"song", type:"fields", label:"song on repeat", q:"what song could you play on repeat forever?",
+    fields:[{key:"title",label:"song",ph:"song title"},{key:"artist",label:"artist",ph:"who sings it"}] },
+  { id:"movies", type:"list", label:"favorite movies", q:"what are your favorite movies?", hint:"add up to 5. comfort movies count", max:5, ph:"type a movie", icon:"🎬" },
+  { id:"goals", type:"ranked", label:"goals for the next 5 years", q:"what are your top 3 goals for the next 5 years?", hint:"big or small, they all matter",
+    n:3, ph:["the biggest one","next up","and one more"] },
+  { id:"travel", type:"list", label:"places to travel", q:"top 5 places you want to travel?", hint:"anywhere in the world", max:5, ph:"city, country, anywhere", icon:"📍" },
+  { id:"xmas", type:"list", label:"christmas list", q:"what's on your christmas list?", hint:"be honest, i'm taking notes", max:10, ph:"add a wish", icon:"🎁" },
+  { id:"food", type:"fields", label:"food and drinks", q:"okay, let's talk food",
+    fields:[{key:"fav",label:"favorite food",ph:"the one you never get tired of"},
+            {key:"drink",label:"go-to drink order",ph:"coffee, boba, anything"},
+            {key:"treat",label:"favorite sweet treat",ph:"dessert, candy, snack"}] },
+  { id:"flower", type:"choice", label:"favorite flower", q:"favorite flower?", other:true,
+    options:[["🌷","tulips"],["🌹","roses"],["🌻","sunflowers"],["🌸","cherry blossoms"],["💮","peonies"],["🪻","lavender"]] },
+  { id:"date", type:"choice", multi:true, label:"perfect date", q:"build your perfect date", hint:"pick as many as you want", other:true,
+    options:[["🍿","cozy movie night"],["👻","horror movie marathon"],["🧺","picnic"],["🥾","nature hike"],["🍝","fancy dinner"],
+             ["🎮","arcade"],["🌊","beach day"],["🎨","art or craft night"],["🛍️","shopping"],["☕","coffee shop hopping"]] },
+  { id:"lovelang", type:"choice", label:"i feel most loved through", q:"what makes you feel most loved?",
+    options:[["💌","sweet words"],["🤲","acts of help"],["🎁","thoughtful gifts"],["⏳","quality time"],["🫂","hugs and closeness"]] },
+  { id:"owl", type:"slider", label:"morning or night", q:"morning person or night owl?",
+    left:["☀️","early bird"], right:["🌙","night owl"],
+    labels:["sunrise girl","mornings are nice","right in the middle","evenings are better","total night owl"] },
+  { id:"spice", type:"slider", label:"spice level", q:"how much spice can you handle?",
+    left:["🥛","mild please"], right:["🔥","bring it"],
+    labels:["no spice at all","a little kick","medium","pretty spicy","make me cry"] },
+  { id:"tot", type:"thisorthat", label:"this or that", q:"this or that", hint:"go with your gut",
+    pairs:[["🏖️ beach","⛰️ mountains"],["🐱 cats","🐶 dogs"],["👻 horror","💕 rom-com"],["💬 texting","📞 calling"],["🍕 pizza","🌮 tacos"],["🌧️ rainy days","☀️ sunny days"]] },
+  { id:"smile", type:"long", label:"always makes me smile", q:"what's something that always makes you smile?", ph:"anything at all" },
+  { id:"dream", type:"long", label:"my dream days", q:"if money didn't matter, what would your days look like?", ph:"describe a perfect ordinary day" },
+  { id:"note", type:"long", label:`a note for ${ME.toLowerCase()}`, q:"anything you want me to know?", hint:"totally optional", ph:"i'm all ears" },
+  { id:"end", type:"end" }
+];
+
+const COLORS = [["#E0475E","red"],["#F6A04D","orange"],["#F5D76E","yellow"],["#7FC59A","green"],["#7DB7E8","blue"],
+  ["#A98BE0","purple"],["#F49AB8","pink"],["#2B2B2B","black"],["#FFFFFF","white"],["#B88A6A","brown"]];
+const TULIP_COLORS = ["#F49AB8","#E8638F","#F7B6C9","#D94C7E","#FBC4D4","#EF7FA5"];
+/* ===================================== */
+
+const stage = document.getElementById("stage");
+const garden = document.getElementById("garden");
+const progressEl = document.getElementById("progress");
+const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const ASK = QUESTIONS.filter(q => q.type !== "intro" && q.type !== "end");
+const LAST = QUESTIONS.length - 1;
+const STORE_KEY = "jas-questionnaire-v1";
+const hasStore = typeof window.storage !== "undefined" && window.storage && typeof window.storage.get === "function";
+
+let answers = {};
+let current = 0;
+let savedIndex = 0;
+let commit = null;
+
+document.getElementById("from").textContent = `for ${HER.toLowerCase()}, from ${ME.toLowerCase()}`;
+
+function el(tag, attrs = {}, ...kids){
+  const n = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)){
+    if (k === "class") n.className = v;
+    else if (k.startsWith("on") && typeof v === "function") n.addEventListener(k.slice(2), v);
+    else if (v !== false && v != null) n.setAttribute(k, v === true ? "" : v);
+  }
+  for (const k of kids.flat()){
+    if (k == null || k === false) continue;
+    n.append(k.nodeType ? k : document.createTextNode(k));
+  }
+  return n;
+}
+function fromHTML(html){ const d = document.createElement("div"); d.innerHTML = html.trim(); return d.firstElementChild; }
+
+/* ---------- storage (progress saves while inside Claude) ---------- */
+async function load(){
+  if (!hasStore) return;
+  try{
+    const r = await window.storage.get(STORE_KEY, false);
+    if (r && r.value){ const d = JSON.parse(r.value); answers = d.answers || {}; savedIndex = d.index || 0; }
+  }catch(e){ /* nothing saved yet */ }
+}
+let saveTimer;
+function save(){
+  if (!hasStore || current === 0) return;
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(async () => {
+    try{ await window.storage.set(STORE_KEY, JSON.stringify({ answers, index: current }), false); }catch(e){}
+  }, 400);
+}
+async function clearAll(){
+  answers = {}; savedIndex = 0;
+  if (hasStore){ try{ await window.storage.delete(STORE_KEY, false); }catch(e){} }
+}
+
+/* ---------- answer helpers ---------- */
+function isAnswered(q){
+  const a = answers[q.id];
+  if (a == null) return false;
+  switch(q.type){
+    case "color": return !!a.name;
+    case "fields": return Object.values(a).some(v => v && v.trim());
+    case "list": return a.length > 0;
+    case "ranked": return a.some(v => v && v.trim());
+    case "choice": return (a.picks && a.picks.length > 0) || !!(a.other && a.other.trim());
+    case "slider": return typeof a === "number";
+    case "thisorthat": return a.some(v => v != null);
+    case "long": return !!a.trim();
+  }
+  return false;
+}
+function formatAnswer(q){
+  if (!isAnswered(q)) return null;
+  const a = answers[q.id];
+  switch(q.type){
+    case "color": return a.custom ? `my own shade (${a.hex})` : a.name;
+    case "fields":
+      if (q.id === "song"){
+        const t = (a.title || "").trim(), r = (a.artist || "").trim();
+        return t && r ? `${t} by ${r}` : (t || r);
+      }
+      return q.fields.filter(f => (a[f.key] || "").trim()).map(f => `${f.label}: ${a[f.key].trim()}`);
+    case "list": return [...a];
+    case "ranked": return a.map((v, i) => v && v.trim() ? `${i + 1}. ${v.trim()}` : null).filter(Boolean);
+    case "choice": return [...a.picks, ...(a.other && a.other.trim() ? [a.other.trim()] : [])].join(", ");
+    case "slider": return q.labels[Math.round(a / 25)];
+    case "thisorthat": return a.map((v, i) => v == null ? null : `${q.pairs[i][v]} over ${q.pairs[i][1 - v]}`).filter(Boolean);
+    case "long": return a.trim();
+  }
+}
+function buildText(){
+  const lines = [`${HER}'s answers 💗`, ""];
+  ASK.forEach(q => {
+    const v = formatAnswer(q);
+    if (!v) return;
+    lines.push(q.label + ":");
+    if (Array.isArray(v)) v.forEach(x => lines.push("  • " + x)); else lines.push("  " + v);
+    lines.push("");
+  });
+  return lines.join("\n").trim();
+}
+
+/* ---------- tulip garden ---------- */
+const TULIP_PATHS = `<path class="stem" d="M12 60V24"/>
+  <path class="leaf" d="M12 50C5 47 3 40 5 35C9 38 11 44 12 50Z"/>
+  <path class="leaf r" d="M12 44C18 42 21 36 19 32C15 35 13 39 12 44Z"/>
+  <path class="bloom" d="M6 12L9 16.5L12 10L15 16.5L18 12C19.5 21 17 26.5 12 26.5C7 26.5 4.5 21 6 12Z"/>`;
+function buildGarden(){
+  garden.innerHTML = "";
+  ASK.forEach((q, i) => {
+    const tilt = (i % 2 ? 1 : -1) * (1 + (i * 7) % 5);
+    garden.insertAdjacentHTML("beforeend",
+      `<svg class="tulip" data-id="${q.id}" viewBox="0 0 24 60" style="--c:${TULIP_COLORS[i % TULIP_COLORS.length]};--tilt:${tilt}deg">${TULIP_PATHS}</svg>`);
+  });
+}
+function updateGarden(){
+  const cur = QUESTIONS[current];
+  garden.querySelectorAll(".tulip").forEach(t => {
+    const q = ASK.find(x => x.id === t.dataset.id);
+    t.classList.toggle("bloomed", isAnswered(q));
+    t.classList.toggle("current", cur && cur.id === q.id);
+  });
+}
+function heroTulips(){
+  return fromHTML(`<svg viewBox="0 0 110 86" width="150" height="118" aria-hidden="true">
+    <g class="ht" style="--d:.15s;--c:#F49AB8" transform="translate(14 22) rotate(-12 12 60)">${TULIP_PATHS}</g>
+    <g class="ht" style="--d:.45s;--c:#F7B6C9" transform="translate(72 22) rotate(12 12 60)">${TULIP_PATHS}</g>
+    <g class="ht" style="--d:0s;--c:#E8638F" transform="translate(39 6) scale(1.33)">${TULIP_PATHS}</g>
+  </svg>`);
+}
+
+/* ---------- inputs ---------- */
+const INPUTS = {
+  color(q, refresh){
+    const box = el("div", { class:"swatches", role:"radiogroup", "aria-label":q.q });
+    const cur = () => answers[q.id];
+    const mark = () => box.querySelectorAll(".swatch").forEach(b => {
+      const on = !!cur() && cur().name === b.dataset.name;
+      b.classList.toggle("on", on);
+      if (b.tagName === "BUTTON") b.setAttribute("aria-checked", on);
+    });
+    COLORS.forEach(([hex, name]) => {
+      box.append(el("button", { class:"swatch", type:"button", role:"radio", "data-name":name, style:`--sw:${hex}`,
+        onclick:() => { answers[q.id] = { name, hex }; mark(); refresh(); } },
+        el("span", { class:"dot" }), el("span", { class:"nm" }, name)));
+    });
+    const picker = el("input", { type:"color", value:(cur() && cur().custom) ? cur().hex : "#f49ab8", "aria-label":"pick your own shade" });
+    const custom = el("label", { class:"swatch custom", "data-name":"__custom" }, picker, el("span", { class:"dot rainbow" }), el("span", { class:"nm" }, "my own shade"));
+    const showCustom = hex => { custom.dataset.name = hex; custom.style.setProperty("--sw", hex); custom.querySelector(".dot").classList.remove("rainbow"); };
+    picker.addEventListener("input", () => { answers[q.id] = { name:picker.value, hex:picker.value, custom:true }; showCustom(picker.value); mark(); refresh(); });
+    if (cur() && cur().custom) showCustom(cur().hex);
+    box.append(custom);
+    mark();
+    return box;
+  },
+
+  fields(q, refresh){
+    answers[q.id] = answers[q.id] || {};
+    const a = answers[q.id];
+    const wrap = el("div", { class:"fields" });
+    q.fields.forEach((f, i) => {
+      const id = `${q.id}-${f.key}`;
+      const inp = el("input", { id, type:"text", placeholder:f.ph, autocomplete:"off", enterkeyhint: i < q.fields.length - 1 ? "next" : "go" });
+      inp.value = a[f.key] || "";
+      inp.addEventListener("input", () => { a[f.key] = inp.value; refresh(); });
+      inp.addEventListener("keydown", e => {
+        if (e.key !== "Enter") return;
+        e.preventDefault();
+        const nxt = wrap.querySelectorAll("input")[i + 1];
+        nxt ? nxt.focus() : next();
+      });
+      wrap.append(el("label", { class:"field", for:id }, el("span", { class:"lbl" }, f.label), inp));
+    });
+    return wrap;
+  },
+
+  list(q, refresh){
+    answers[q.id] = answers[q.id] || [];
+    const arr = answers[q.id];
+    const chips = el("ul", { class:"chips" });
+    const inp = el("input", { type:"text", placeholder:q.ph, autocomplete:"off", "aria-label":q.ph, enterkeyhint:"enter" });
+    const add = el("button", { class:"btn btn-add", type:"button" }, "add");
+    const count = el("p", { class:"count" });
+    const draw = (newIdx) => {
+      chips.innerHTML = "";
+      arr.forEach((v, i) => {
+        chips.append(el("li", { class:"chip" + (i === newIdx && !reduce ? " pop" : "") },
+          q.icon ? el("span", { "aria-hidden":"true" }, q.icon) : null,
+          el("span", {}, v),
+          el("button", { type:"button", class:"x", "aria-label":`remove ${v}`,
+            onclick:() => { arr.splice(i, 1); draw(); refresh(); inp.focus(); } }, "×")));
+      });
+      const full = arr.length >= q.max;
+      inp.disabled = full; add.disabled = full;
+      inp.placeholder = full ? "that's the max!" : q.ph;
+      count.textContent = `${arr.length} of ${q.max}`;
+    };
+    const doAdd = () => {
+      const v = inp.value.trim();
+      if (!v || arr.length >= q.max) return;
+      arr.push(v); inp.value = "";
+      draw(arr.length - 1); refresh();
+      if (!inp.disabled) inp.focus();
+    };
+    add.addEventListener("click", doAdd);
+    inp.addEventListener("keydown", e => { if (e.key === "Enter"){ e.preventDefault(); doAdd(); } });
+    commit = doAdd; // anything typed but not added still counts when she taps next
+    draw();
+    return el("div", {}, el("div", { class:"adder" }, inp, add), chips, count);
+  },
+
+  ranked(q, refresh){
+    answers[q.id] = answers[q.id] || Array(q.n).fill("");
+    const arr = answers[q.id];
+    const wrap = el("ol", { class:"ranked" });
+    for (let i = 0; i < q.n; i++){
+      const inp = el("input", { type:"text", placeholder:q.ph[i], autocomplete:"off", "aria-label":`goal ${i + 1}`, enterkeyhint: i < q.n - 1 ? "next" : "go" });
+      inp.value = arr[i] || "";
+      inp.addEventListener("input", () => { arr[i] = inp.value; refresh(); });
+      inp.addEventListener("keydown", e => {
+        if (e.key !== "Enter") return;
+        e.preventDefault();
+        const n = wrap.querySelectorAll("input")[i + 1];
+        n ? n.focus() : next();
+      });
+      wrap.append(el("li", {}, el("span", { class:"num", "aria-hidden":"true" }, String(i + 1)), inp));
+    }
+    return wrap;
+  },
+
+  choice(q, refresh){
+    answers[q.id] = answers[q.id] || { picks:[], other:"" };
+    const a = answers[q.id];
+    const grid = el("div", { class:"opts", role:q.multi ? "group" : "radiogroup", "aria-label":q.q });
+    const syncAll = () => grid.querySelectorAll(".opt").forEach(b => {
+      const on = a.picks.includes(b.dataset.label);
+      b.classList.toggle("on", on);
+      b.setAttribute("aria-checked", on);
+    });
+    q.options.forEach(([emo, label]) => {
+      const b = el("button", { type:"button", class:"opt", role:q.multi ? "checkbox" : "radio", "data-label":label },
+        el("span", { class:"emo", "aria-hidden":"true" }, emo), el("span", {}, label));
+      b.addEventListener("click", () => {
+        if (q.multi){
+          const k = a.picks.indexOf(label);
+          k >= 0 ? a.picks.splice(k, 1) : a.picks.push(label);
+        } else {
+          a.picks = a.picks[0] === label ? [] : [label];
+        }
+        syncAll();
+        if (a.picks.includes(label) && !reduce){ b.classList.remove("wiggle"); void b.offsetWidth; b.classList.add("wiggle"); }
+        refresh();
+      });
+      grid.append(b);
+    });
+    syncAll();
+    const kids = [grid];
+    if (q.other){
+      const inp = el("input", { type:"text", placeholder:"something else? type it here", autocomplete:"off", "aria-label":"something else" });
+      inp.value = a.other || "";
+      inp.addEventListener("input", () => { a.other = inp.value; refresh(); });
+      kids.push(el("div", { class:"other" }, inp));
+    }
+    return el("div", {}, ...kids);
+  },
+
+  slider(q, refresh){
+    const start = typeof answers[q.id] === "number" ? answers[q.id] : 50;
+    const r = el("input", { type:"range", min:"0", max:"100", value:String(start), "aria-label":q.q });
+    const out = el("p", { class:"slider-out", "aria-live":"polite" });
+    const paint = () => {
+      const v = +r.value, done = typeof answers[q.id] === "number";
+      r.style.setProperty("--v", v + "%");
+      out.textContent = done ? q.labels[Math.round(v / 25)] : "slide to answer";
+      out.classList.toggle("muted", !done);
+    };
+    const set = () => { answers[q.id] = +r.value; paint(); refresh(); };
+    r.addEventListener("input", set);
+    r.addEventListener("click", set);
+    paint();
+    return el("div", {},
+      el("div", { class:"ends" },
+        el("span", {}, el("b", { "aria-hidden":"true" }, q.left[0]), q.left[1]),
+        el("span", {}, q.right[1], el("b", { "aria-hidden":"true" }, q.right[0]))),
+      r, out);
+  },
+
+  thisorthat(q, refresh){
+    answers[q.id] = answers[q.id] || Array(q.pairs.length).fill(null);
+    const a = answers[q.id];
+    const wrap = el("div", { class:"tot" });
+    q.pairs.forEach((pair, i) => {
+      const row = el("div", { class:"tot-row", role:"radiogroup", "aria-label":pair.join(" or ") });
+      const sync = () => {
+        row.classList.toggle("decided", a[i] != null);
+        row.querySelectorAll(".tot-btn").forEach((b, j) => { b.classList.toggle("on", a[i] === j); b.setAttribute("aria-checked", a[i] === j); });
+      };
+      pair.forEach((label, j) => {
+        row.append(el("button", { type:"button", class:"tot-btn", role:"radio",
+          onclick:() => { a[i] = a[i] === j ? null : j; sync(); refresh(); } }, label));
+        if (j === 0) row.append(el("span", { class:"or", "aria-hidden":"true" }, "or"));
+      });
+      sync();
+      wrap.append(row);
+    });
+    return wrap;
+  },
+
+  long(q, refresh){
+    const t = el("textarea", { rows:"4", placeholder:q.ph, "aria-label":q.q });
+    t.value = answers[q.id] || "";
+    const grow = () => { t.style.height = "auto"; t.style.height = t.scrollHeight + "px"; };
+    t.addEventListener("input", () => { answers[q.id] = t.value; refresh(); grow(); });
+    requestAnimationFrame(grow);
+    return t;
+  }
+};
+
+/* ---------- screens ---------- */
+function renderQuestion(q){
+  const nextBtn = el("button", { class:"btn btn-primary", type:"button", onclick:next });
+  const refresh = () => {
+    const done = isAnswered(q);
+    const last = current === LAST - 1;
+    nextBtn.textContent = last ? (done ? "finish" : "skip and finish") : (done ? "next" : "skip");
+    nextBtn.classList.toggle("is-skip", !done);
+    updateGarden();
+    save();
+  };
+  const head = [el("h1", { tabindex:"-1" }, q.q)];
+  if (q.hint) head.push(el("p", { class:"hint" }, q.hint));
+  const input = INPUTS[q.type](q, refresh);
+  const back = el("button", { class:"btn btn-ghost", type:"button", onclick:() => go(current - 1, -1) }, "back");
+  refresh();
+  return [...head, el("div", { class:"answer" }, input), el("div", { class:"nav" }, back, nextBtn)];
+}
+
+function renderIntro(){
+  const resume = savedIndex > 0;
+  const actions = el("div", { class:"intro-actions" });
+  if (resume){
+    actions.append(
+      el("button", { class:"btn btn-primary big-btn", type:"button", onclick:() => go(savedIndex, 1) },
+        savedIndex === LAST ? "see my answers" : "pick up where you left off"),
+      el("button", { class:"btn btn-ghost", type:"button", onclick:() => go(1, 1) }, "go through from the start"));
+  } else {
+    actions.append(el("button", { class:"btn btn-primary big-btn", type:"button", onclick:() => go(1, 1) }, "let's start"));
+  }
+  return [el("div", { class:"intro" },
+    el("div", { class:"hero" }, heroTulips()),
+    el("h1", { tabindex:"-1" }, "hi ", el("span", { class:"name" }, HER.toLowerCase())),
+    el("p", { class:"lede" }, "i made you a little questionnaire so i can get to know you even better. no wrong answers, and you can skip anything."),
+    el("p", { class:"small" }, `${ASK.length} questions. every answer grows a tulip.`),
+    actions)];
+}
+
+function renderEnd(){
+  const list = el("dl", { class:"summary" });
+  ASK.forEach(q => {
+    const v = formatAnswer(q);
+    if (!v || (Array.isArray(v) && !v.length)) return;
+    const dd = el("dd");
+    if (q.type === "color") dd.append(el("span", { class:"mini-dot", style:`--sw:${answers[q.id].hex}` }), v);
+    else if (Array.isArray(v)){ const ul = el("ul"); v.forEach(x => ul.append(el("li", {}, x))); dd.append(ul); }
+    else dd.textContent = v;
+    list.append(el("div", { class:"row" }, el("dt", {}, q.label), dd));
+  });
+  const any = list.children.length > 0;
+
+  const eraseBtn = el("button", { class:"linkish", type:"button" }, "start over");
+  let armed = false;
+  eraseBtn.addEventListener("click", async () => {
+    if (!armed){ armed = true; eraseBtn.textContent = "tap again to erase everything"; return; }
+    await clearAll(); go(0, -1);
+  });
+
+  return [el("div", { class:"end" },
+    el("h1", { tabindex:"-1" }, any ? "all done 💗" : "nothing here yet"),
+    el("p", { class:"lede" }, any
+      ? `thank you for doing this. send it over so i can read every answer.`
+      : "you skipped everything! go back and answer a few, even just one."),
+    any ? list : null,
+    any ? el("div", { class:"end-actions" },
+      el("button", { class:"btn btn-primary", type:"button", onclick:share }, `send to ${ME.toLowerCase()}`),
+      el("button", { class:"btn btn-soft", type:"button", onclick:() => copy(buildText()) }, "copy my answers")) : null,
+    el("div", { class:"tiny" },
+      el("button", { class:"linkish", type:"button", onclick:() => go(1, -1) }, any ? "change an answer" : "back to the questions"),
+      any ? eraseBtn : null))];
+}
+
+function render(i, dir){
+  current = i;
+  commit = null;
+  const q = QUESTIONS[i];
+  const wrap = el("div", { class:"q-wrap" + (reduce ? "" : (dir < 0 ? " in-left" : " in-right")) });
+  const body = q.type === "intro" ? renderIntro() : q.type === "end" ? renderEnd() : renderQuestion(q);
+  wrap.append(...body);
+  stage.replaceChildren(wrap);
+  const qi = ASK.indexOf(q);
+  progressEl.textContent = qi >= 0 ? `${qi + 1} of ${ASK.length}` : "";
+  document.body.dataset.screen = q.type;
+  updateGarden();
+  save();
+  const h = wrap.querySelector("h1");
+  if (h) h.focus({ preventScroll:true });
+  window.scrollTo({ top:0, behavior: reduce ? "auto" : "smooth" });
+  if (q.type === "end") petals();
+}
+
+function go(to, dir){
+  to = Math.max(0, Math.min(LAST, to));
+  const old = stage.firstElementChild;
+  if (old && !reduce){
+    old.classList.remove("in-left", "in-right");
+    old.classList.add(dir < 0 ? "out-right" : "out-left");
+    setTimeout(() => render(to, dir), 190);
+  } else render(to, dir);
+}
+function next(){ if (commit) commit(); go(current + 1, 1); }
+
+/* ---------- finishing touches ---------- */
+function petals(){
+  if (reduce || !ASK.some(isAnswered)) return;
+  const box = el("div", { class:"petals", "aria-hidden":"true" });
+  for (let i = 0; i < 36; i++){
+    const s = 8 + Math.random() * 10;
+    const p = el("span");
+    p.style.cssText = `left:${Math.random() * 100}%;width:${s}px;height:${s * 1.3}px;background:${TULIP_COLORS[i % TULIP_COLORS.length]};` +
+      `animation-duration:${3 + Math.random() * 2.5}s;animation-delay:${Math.random() * .9}s;` +
+      `--drift:${Math.random() * 140 - 70}px;--spin:${Math.random() * 720 - 360}deg`;
+    box.append(p);
+  }
+  document.body.append(box);
+  setTimeout(() => box.remove(), 7000);
+}
+let toastTimer;
+function toast(msg){
+  const t = document.getElementById("toast");
+  t.textContent = msg; t.classList.add("show");
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove("show"), 2200);
+}
+async function copy(text){
+  try{ await navigator.clipboard.writeText(text); toast("copied! paste it in a text 💌"); return; }catch(e){}
+  const ta = el("textarea", { style:"position:fixed;opacity:0" }); ta.value = text;
+  document.body.append(ta); ta.select();
+  try{ document.execCommand("copy"); toast("copied! paste it in a text 💌"); }catch(e){ toast("couldn't copy, try a screenshot"); }
+  ta.remove();
+}
+async function share(){
+  const text = buildText();
+  if (navigator.share){
+    try{ await navigator.share({ title:`${HER}'s answers`, text }); return; }
+    catch(e){ if (e && e.name === "AbortError") return; }
+  }
+  copy(text);
+}
+
+(async () => { buildGarden(); await load(); render(0, 1); })();
+</script>
+</body>
+</html>
